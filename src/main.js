@@ -12,6 +12,27 @@
 const http = require('http');
 
 /**
+ * @typedef Post
+ * @property {string} id
+ * @property {string} title
+ * @property {string} content
+ */
+
+/** @type {Post[]} */
+const posts = [
+  {
+    id: 'my_first_post',
+    title: 'My first post',
+    content: 'Hello!',
+  },
+  {
+    id: 'my_second_post',
+    title: 'My second post',
+    content: 'Second post!',
+  },
+];
+
+/**
  * Post
  *
  * GET /posts
