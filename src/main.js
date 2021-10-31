@@ -23,13 +23,36 @@ const server = http.createServer((req, res) => {
         _route.method === req.method
     );
 
-    if (!route) {
+    if (!req.url || !route) {
       res.statusCode = 404;
       res.end('Not found');
       return;
     }
 
-    const result = await route.callback();
+    const regexResult = route.url.exec(req.url);
+
+    if (!regexResult) {
+      res.statusCode = 404;
+      res.end('Not found.');
+      return;
+    }
+
+    /** @type {Object.<string, *> | undefined} */
+    const reqBody =
+      (req.headers['Content-Type'] === 'application/json' &&
+        (await new Promise((resolve, reject) => {
+          req.setEncoding('utf-8');
+          res.on('data', (data) => {
+            try {
+              resolve(JSON.parse(data));
+            } catch {
+              reject(new Error('Ill-formed json'));
+            }
+          });
+        }))) ||
+      undefined;
+
+    const result = await route.callback(regexResult, reqBody);
     res.statusCode = result.statusCode;
 
     if (typeof result.body === 'string') {
